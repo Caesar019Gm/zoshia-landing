@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Zoshia Technologies — POS para gimnasios</title>
+  <meta name="description" content="Zoshia Technologies: POS y gestión SaaS para gimnasios. Membresías, check-ins, pagos recurrentes y reportes en una sola plataforma." />
+  <style>
+    :root{
+      --bg: #070A12;
+      --panel: rgba(255,255,255,.06);
+      --panel2: rgba(255,255,255,.08);
+      --border: rgba(255,255,255,.12);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.68);
+      --muted2: rgba(255,255,255,.55);
+      --shadow: 0 20px 60px rgba(0,0,0,.55);
+      --r: 18px;
+
+      --a1:#7C3AED;  /* purple */
+      --a2:#22D3EE;  /* cyan */
+      --a3:#60A5FA;  /* blue */
+      --a4:#F472B6;  /* pink */
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      color:var(--text);
+      background:
+        radial-gradient(1100px 700px at 15% 10%, rgba(124,58,237,.20), transparent 60%),
+        radial-gradient(900px 600px at 85% 15%, rgba(34,211,238,.18), transparent 55%),
+        radial-gradient(900px 600px at 70% 90%, rgba(244,114,182,.12), transparent 55%),
+        radial-gradient(900px 600px at 20% 90%, rgba(96,165,250,.14), transparent 55%),
+        linear-gradient(180deg, #060815 0%, #070A12 55%, #050713 100%);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
+      line-height:1.55;
+      overflow-x:hidden;
+    }
+
+    a{ color:inherit; text-decoration:none; }
+    .wrap{ max-width:1100px; margin:0 auto; padding:28px 18px 70px; }
+
+    /* Top bar */
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 14px;
+      border:1px solid var(--border);
+      background: rgba(0,0,0,.22);
+      border-radius: 999px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 12px 40px rgba(0,0,0,.35);
+    }
+    .brand{ display:flex; align-items:center; gap:10px; font-weight:700; letter-spacing:.3px; }
+    .logo{
+      width:34px; height:34px; border-radius: 12px;
+      background: linear-gradient(135deg, rgba(124,58,237,.95), rgba(34,211,238,.85));
+      box-shadow: 0 12px 30px rgba(124,58,237,.25);
+      position:relative;
+      border:1px solid rgba(255,255,255,.18);
+    }
+    .logo:after{
+      content:"";
+      position:absolute; inset:7px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(0,0,0,.35), rgba(255,255,255,.08));
+      border:1px solid rgba(255,255,255,.10);
+    }
+    .nav{ display:flex; gap:12px; align-items:center; }
+    .nav a{
+      font-size:14px;
+      color: var(--muted);
+      padding:8px 10px;
+      border-radius: 999px;
+      transition: .2s ease;
+    }
+    .nav a:hover{ color: var(--text); background: rgba(255,255,255,.06); }
+
+    .pill{
+      font-size:12px;
+      padding:7px 10px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: var(--muted);
+      display:inline-flex; gap:8px; align-items:center;
+    }
+    .dot{
+      width:8px; height:8px; border-radius:99px;
+      background: linear-gradient(180deg, var(--a2), var(--a1));
+      box-shadow: 0 0 0 4px rgba(34,211,238,.12);
+    }
+
+    /* Hero */
+    .hero{
+      margin-top:22px;
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:18px;
+      align-items:stretch;
+    }
+    @media (max-width: 920px){ .hero{ grid-template-columns:1fr; } }
+
+    .card{
+      border:1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.04));
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+    .card:before{
+      content:"";
+      position:absolute; inset:-2px;
+      background: radial-gradient(500px 120px at 18% 10%, rgba(34,211,238,.15), transparent 70%),
+                  radial-gradient(500px 120px at 80% 20%, rgba(124,58,237,.18), transparent 70%);
+      pointer-events:none;
+      opacity:.9;
+    }
+    .card-inner{ position:relative; padding:26px; }
+
+    .h1{
+      font-size:44px;
+      line-height:1.05;
+      margin:10px 0 10px;
+      letter-spacing:-.8px;
+    }
+    @media (max-width: 520px){ .h1{ font-size:36px; } }
+    .subtitle{
+      margin:0 0 18px;
+      color: var(--muted);
+      max-width: 62ch;
+      font-size:16px;
+    }
+
+    .cta-row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top: 18px; }
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:10px;
+      padding:12px 14px;
+      border-radius: 12px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      font-weight:700;
+      transition:.18s ease;
+      cursor:pointer;
+    }
+    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.09); }
+    .btn-primary{
+      border:0;
+      background: linear-gradient(135deg, rgba(124,58,237,.98), rgba(34,211,238,.92));
+      box-shadow: 0 18px 50px rgba(124,58,237,.22);
+    }
+    .btn-primary:hover{ filter: brightness(1.05); }
+    .btn small{ font-weight:600; color: rgba(255,255,255,.82); }
+
+    .fineprint{
+      margin-top: 12px;
+      color: var(--muted2);
+      font-size: 13px;
+    }
+
+    /* Side preview */
+    .preview{
+      height:100%;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+    .mini{
+      padding:16px;
+      border-radius: 16px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.22);
+      backdrop-filter: blur(10px);
+    }
+    .mini h3{ margin:0 0 6px; font-size:14px; color: rgba(255,255,255,.85); }
+    .kpis{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap:10px;
+      margin-top:10px;
+    }
+    .kpi{
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      padding:12px;
+    }
+    .kpi .n{ font-weight:800; font-size:18px; letter-spacing:-.3px; }
+    .kpi .l{ color: var(--muted2); font-size:12px; margin-top:2px; }
+    .tagrow{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+    .tag{
+      font-size:12px;
+      padding:6px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      color: var(--muted);
+    }
+
+    /* Sections */
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap:14px;
+      margin-top: 16px;
+    }
+    @media (max-width: 920px){ .grid{ grid-template-columns:1fr; } }
+
+    .section{
+      margin-top: 18px;
+      padding: 18px;
+    }
+    .section h2{
+      margin:0 0 10px;
+      font-size: 18px;
+      letter-spacing: -.2px;
+    }
+    .section p{ margin:0; color: var(--muted); }
+
+    .feature{
+      padding:16px;
+      border-radius: 16px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+    }
+    .feature .icon{
+      width:38px; height:38px;
+      border-radius: 14px;
+      display:grid; place-items:center;
+      background: linear-gradient(135deg, rgba(96,165,250,.35), rgba(124,58,237,.25));
+      border:1px solid rgba(255,255,255,.14);
+      margin-bottom:10px;
+    }
+    .feature h3{ margin: 0 0 6px; font-size: 14px; }
+    .feature p{ margin:0; color: var(--muted); font-size: 13px; }
+
+    /* Plans */
+    .plans{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap:14px;
+      margin-top: 12px;
+    }
+    @media (max-width: 920px){ .plans{ grid-template-columns:1fr; } }
+    .plan{
+      padding:18px;
+      border-radius: 18px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      position:relative;
+      overflow:hidden;
+    }
+    .plan strong{ font-size:14px; }
+    .plan .desc{ color: var(--muted); font-size:13px; margin-top:6px; }
+    .plan ul{ margin:12px 0 0 18px; color: var(--muted); font-size:13px; }
+    .badge{
+      position:absolute; top:12px; right:12px;
+      font-size:12px;
+      padding:6px 10px;
+      border-radius: 999px;
+      background: rgba(34,211,238,.12);
+      border:1px solid rgba(34,211,238,.22);
+      color: rgba(255,255,255,.86);
+    }
+
+    /* Contact */
+    .contact{
+      margin-top: 14px;
+      display:flex; gap:14px; flex-wrap:wrap; align-items:center;
+      padding: 16px;
+      border-radius: 18px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.22);
+      backdrop-filter: blur(10px);
+    }
+    .contact a{
+      font-weight:700;
+      padding:10px 12px;
+      border-radius: 12px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+    }
+    .contact a:hover{ background: rgba(255,255,255,.09); }
+    footer{
+      margin-top: 22px;
+      color: var(--muted2);
+      font-size: 13px;
+      text-align:center;
+      padding: 10px 0;
+    }
+
+    /* little svg icons */
+    .ico{ width:18px; height:18px; display:inline-block; vertical-align:middle; }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>Zoshi Technologies</div>
+      </div>
+
+      <div class="nav">
+        <a href="#producto">Producto</a>
+        <a href="#planes">Planes</a>
+        <a href="#contacto">Contacto</a>
+        <span class="pill"><span class="dot"></span> SaaS para gimnasios</span>
+      </div>
+    </div>
+
+    <div class="hero">
+      <div class="card">
+        <div class="card-inner">
+          <span class="pill"><span class="dot"></span> Sistema POS + gestión completa</span>
+          <h1 class="h1">POS y administración<br/>para gimnasios, sin caos.</h1>
+          <p class="subtitle">
+            Administra membresías, accesos, pagos recurrentes y reportes desde una sola plataforma.
+            Diseñado para operar rápido, claro y con control.
+          </p>
+
+          <div class="cta-row">
+            <a class="btn btn-primary" href="#contacto">
+              <svg class="ico" viewBox="0 0 24 24" fill="none">
+                <path d="M7 7h10v10H7V7Z" stroke="white" stroke-width="2" opacity=".9"/>
+                <path d="M5 12h14" stroke="white" stroke-width="2" opacity=".9"/>
+              </svg>
+              Solicitar demo
+            </a>
+
+            <a class="btn" href="#producto">
+              <svg class="ico" viewBox="0 0 24 24" fill="none">
+                <path d="M12 5v14" stroke="white" stroke-width="2" opacity=".85"/>
+                <path d="M5 12h14" stroke="white" stroke-width="2" opacity=".85"/>
+              </svg>
+              Ver funciones
+            </a>
+          </div>
+
+          <div class="fineprint">
+            * Este landing es informativo (apto para revisión administrativa de Stripe). No requiere precios visibles.
+          </div>
+        </div>
+      </div>
+
+      <div class="preview">
+        <div class="mini">
+          <h3>Vista rápida (operación diaria)</h3>
+          <div class="tagrow">
+            <span class="tag">Membresías</span>
+            <span class="tag">Check-ins</span>
+            <span class="tag">Pagos</span>
+            <span class="tag">Reportes</span>
+          </div>
+
+          <div class="kpis">
+            <div class="kpi">
+              <div class="n">+ Control</div>
+              <div class="l">Accesos y expiraciones</div>
+            </div>
+            <div class="kpi">
+              <div class="n">+ Ingresos</div>
+              <div class="l">Planes recurrentes</div>
+            </div>
+            <div class="kpi">
+              <div class="n">Multi-sucursal</div>
+              <div class="l">Escalable</div>
+            </div>
+            <div class="kpi">
+              <div class="n">Dashboard</div>
+              <div class="l">KPIs en tiempo real</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mini">
+          <h3>Ideal para</h3>
+          <div class="tagrow">
+            <span class="tag">Gimnasios</span>
+            <span class="tag">Box</span>
+            <span class="tag">Centros deportivos</span>
+            <span class="tag">Estudios</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="producto" class="card section" style="margin-top:18px;">
+      <div class="card-inner">
+        <h2>¿Qué es Zoshia Technologies?</h2>
+        <p>
+          Zoshia Technologies es una plataforma SaaS diseñada para gimnasios y centros deportivos.
+          Permite gestionar miembros, planes, pagos recurrentes, accesos diarios y reportes operativos en tiempo real.
+        </p>
+
+        <div class="grid" style="margin-top:16px;">
+          <div class="feature">
+            <div class="icon">
+              <svg class="ico" viewBox="0 0 24 24" fill="none">
+                <path d="M7 8h10M7 12h10M7 16h10" stroke="white" stroke-width="2" opacity=".9"/>
+              </svg>
+            </div>
+            <h3>Gestión de miembros</h3>
+            <p>Altas, bajas, estados, historial y control de membresía.</p>
+          </div>
+
+          <div class="feature">
+            <div class="icon">
+              <svg class="ico" viewBox="0 0 24 24" fill="none">
+                <path d="M7 12l3 3 7-7" stroke="white" stroke-width="2" opacity=".9"/>
+              </svg>
+            </div>
+            <h3>Check-ins y accesos</h3>
+            <p>Validación rápida para entrada diaria y vencimientos visibles.</p>
+          </div>
+
+          <div class="feature">
+            <div class="icon">
+              <svg class="ico" viewBox="0 0 24 24" fill="none">
+                <path d="M6 7h12v10H6V7Z" stroke="white" stroke-width="2" opacity=".9"/>
+                <path d="M8 10h8" stroke="white" stroke-width="2" opacity=".9"/>
+              </svg>
+            </div>
+            <h3>Pagos y planes</h3>
+            <p>Planes mensuales, pagos recurrentes y administración centralizada.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="planes" class="card section">
+      <div class="card-inner">
+        <h2>Planes disponibles</h2>
+        <p>Selecciona un plan según el tamaño de tu operación. (Los precios se definen al contratar.)</p>
+
+        <div class="plans">
+          <div class="plan">
+            <strong>Basic</strong>
+            <div class="desc">Para gimnasios pequeños y operación simple.</div>
+            <ul>
+              <li>Membresías y check-ins</li>
+              <li>Panel básico</li>
+              <li>Soporte por correo</li>
+            </ul>
+          </div>
+
+          <div class="plan">
+            <div class="badge">Más elegido</div>
+            <strong>Pro</strong>
+            <div class="desc">Para operación diaria completa y control.</div>
+            <ul>
+              <li>Reportes y dashboard</li>
+              <li>Pagos recurrentes</li>
+              <li>Gestión avanzada</li>
+            </ul>
+          </div>
+
+          <div class="plan">
+            <strong>Premium</strong>
+            <div class="desc">Para multi-sucursal y necesidades avanzadas.</div>
+            <ul>
+              <li>Multi-sucursal</li>
+              <li>Roles y staff</li>
+              <li>Soporte prioritario</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="contacto" class="contact">
+      <div style="flex:1; min-width:240px;">
+        <div class="pill"><span class="dot"></span> Contacto y soporte</div>
+        <div style="margin-top:8px; color: var(--muted);">
+          Para demo, soporte o contratación, contáctanos por correo.
+        </div>
+      </div>
+      <a href="mailto:zoshiasoportech.com">zoshiasoportech@outlook.com</a>
+    </div>
+
+    <footer>
+      © <span id="y"></span> Zoshia Technologies — Software de gestión para gimnasios
+    </footer>
+  </div>
+
+  <script>
+    document.getElementById("y").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
